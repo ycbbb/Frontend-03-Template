@@ -2,7 +2,7 @@
 #姓名:严陈斌
 #班级: 前端进阶训练营3期
 #小组: 2组
-#作业&总结连接 https://github.com/ycbbb/Frontend-03-Template/tree/master/week01
+#作业&总结连接 https://github.com/ycbbb/Frontend-03-Template/tree/master/week02
 学习心得： 
 状态机
 morre 有确定的状态机    mealy 根据输入决定状态的状态机
