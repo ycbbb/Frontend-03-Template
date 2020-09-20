@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>游戏</title>
+  <style>
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: green;
+      border: 1px solid white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 100px;
+      font-size: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="board"></div>
+  <script>
+    let pattern = [
+      0, 0, 0,
+      0, 0, 0,
+      0, 0, 0,
+    ];
+    let color = 1;
+    function show() {
+      let board = document.getElementById('board');
+      board.innerHTML = ''; // 重置棋盘
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          let cell = document.createElement("div");
+          cell.classList.add('cell');
+          cell.innerText =
+            pattern[i * 3 + j] === 2 ? 'X' :
+              pattern[i * 3 + j] === 1 ? 'O' : '';
+          cell.addEventListener('click', () => userMove(i, j));
+          board.appendChild(cell);
+        }
+        board.appendChild(document.createElement('br'));
+      }
+    }
+    function userMove(x, y) {
+      pattern[x * 3 + y] = color;
+      if (check(pattern, color)) {
+        alert(color === 2 ? 'X is winner !' : 'O is winner')
+      }
+      color = 3 - color;
+      show();
+      computerMove();
+    }
+    function computerMove() {
+      let choice = bestChoice(pattern, color);
+      if (choice.point) {
+        console.log('choice.point', choice.point);
+        console.log('choice.point[0] * 3 + choice.point[1]', choice.point[0] * 3 + choice.point[1]);
+        pattern[choice.point[0] * 3 + choice.point[1]] = color;
+      }
+      if (check(pattern, color)) {
+        alert(color === 2 ? 'X is winner!' : 'O is winner!')
+      }
+      color = 3 - color;
+      show();
+    }
+    function check(pattern, color) {
+      // 行
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[i * 3 + j] !== color) {
+            win = false;
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      // 列
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[j * 3 + i] !== color) {
+            win = false;
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      // 斜向一，横纵坐标相等(左上至右下)
+      {
+        let win = true;
+        for (let i = 0; i < 3; i++) {
+          if (pattern[i * 3 + i] !== color) {
+            win = false;
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      // 斜向二：横纵坐标相反(左下至右上)
+      {
+        let win = true;
+        for (let i = 0; i < 3; i++) {
+          if (pattern[i * 3 + 2 - i] !== color) {
+            win = false;
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function clone(pattern) {
+      return Object.create(pattern);
+    }
+    function willWin(pattern, color) {
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (pattern[i * 3 + j]) {
+            continue;
+          }
+          let tmp = clone(pattern);
+          tmp[i * 3 + j] = color;
+          if (check(tmp, color)) {
+            return [i, j];
+          }
+        }
+      }
+      return null;
+    }
+    function bestChoice(pattern, color) {
+      let point = willWin(pattern, color);
+      if (point) {
+        return {
+          point: point,
+          result: 1
+        }
+      }
+      let result = -1;
+      outer: for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          if (pattern[i * 3 + j] !== 0) {
+            continue;
+          }
+          let tmp = clone(pattern);
+          tmp[i * 3 + j] = color;
+          let opp = bestChoice(tmp, 3 - color);
+          if (-opp.result >= result) {
+            point = [i, j];
+            result = -opp.result;
+          }
+          if (result === 1) {
+            break outer;
+          }
+        }
+      }
+      return {
+        point: point,
+        result: point ? result : 0
+      }
+    }
+    show();
+  </script>
+</body>
+
+</html>
